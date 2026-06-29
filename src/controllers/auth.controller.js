@@ -1,5 +1,5 @@
 const userModel=require("../models/user.model")
-
+const jwt=require("jsonwebtoken")
 //user register controller and
 //POST /api/auth/register
 async function userRegisterController(req,res){
@@ -18,6 +18,12 @@ async function userRegisterController(req,res){
      const user=await userModel.create({
         email,password,name
      })
+     //jwt.sifn ask = payload ad private key(private key=search on google jwt secret key generator)
+const token = jwt.sign(
+  { userId: user._id },
+  process.env.JWT_SECRET,
+  { expiresIn: "7d" }
+);//next step set token in cookies npm i cookie-parser
 }
 module.exports={
     userRegisterController
