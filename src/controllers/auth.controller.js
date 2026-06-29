@@ -15,6 +15,9 @@ async function userRegisterController(req,res){
             status:"failed"
         })
      }
+     const user=await userModel.create({
+        email,password,name
+     })
 }
 module.exports={
     userRegisterController
