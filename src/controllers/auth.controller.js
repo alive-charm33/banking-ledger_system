@@ -24,6 +24,15 @@ const token = jwt.sign(
   process.env.JWT_SECRET,
   { expiresIn: "7d" }
 );//next step set token in cookies npm i cookie-parser
+res.cookie("token",token)
+res.status(201).json({
+    user:{
+        _id:user._id,
+        email:user.email,
+        name:user.name
+    },
+    token
+})
 }
 module.exports={
     userRegisterController

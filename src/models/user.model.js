@@ -1,28 +1,36 @@
 const mongoose=require("mongoose");
 const bcrypt=require("bcryptjs")
 
-const userSchema= new mongoose.Schema({
-    //properties
+const userSchema = new mongoose.Schema(
+{//properrties
     email:{
         type:String,
         required:[true,"Email is required for creating a user"],
         trim:true,
-        unique:[true,"Email already exists"],
+        unique:true,
         lowercase:true,
-        match:[/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,"Invalid Email address"]
+        match:[
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+            "Invalid Email address"
+        ]
     },
+
     name:{
         type:String,
         required:[true,"Name is required for creating an account"]
     },
+
     password:{
         type:String,
-        required:[true,"password is required for creating an account"],
-        minlength:[6,"password should contain more than 6 characters"],
+        required:[true,"Password is required for creating an account"],
+        minlength:[6,"Password should contain at least 6 characters"],
         select:false
-    },
+    }
+
+},
+{
     timestamps:true
-})
+});
 userSchema.pre("save",async function(next){
     // if user password is changed then it is hashed
     if(!this.isModified("password")){
