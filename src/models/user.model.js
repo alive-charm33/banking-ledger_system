@@ -31,15 +31,14 @@ const userSchema = new mongoose.Schema(
 {
     timestamps:true
 });
-userSchema.pre("save",async function(next){
+userSchema.pre("save", async function () {
     // if user password is changed then it is hashed
-    if(!this.isModified("password")){
-        return next()
+    if (!this.isModified("password")) {
+        return;
     }
-    const hash=await bcrypt.hash(this.password,10)
-    this.password=hash
-    return next()
-})
+    const hash = await bcrypt.hash(this.password, 10);
+    this.password = hash;
+});
 
 userSchema.methods.comparePassword=async function(password){
     return await bcrypt.compare(password,this.password)
