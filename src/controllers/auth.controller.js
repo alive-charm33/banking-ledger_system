@@ -1,39 +1,50 @@
 const userModel=require("../models/user.model")
 const jwt=require("jsonwebtoken")
-//user register controller and
+
 //POST /api/auth/register
 async function userRegisterController(req,res){
-//controller mein kuch data ayega wo data ke sath hume naya user create krna hoga
-// wo data kya kya ayega:email,pasword,name
-     const {email,password,name}=req.body
-     const isExists=await userModel.findOne({
-        email:email
-     })
-     if(isExists){
-        return res.status(422).json({
-            message:"User already existes with email",
-            status:"failed"
+    try {
+        const {email, password, name} = req.body
+
+        if (!email || !password || !name) {
+            return res.status(400).json({
+                message: "email, password and name are required",
+                status: "failed"
+            })
+        }
+
+        const isExists = await userModel.findOne({ email })
+        if (isExists) {
+            return res.status(422).json({
+                message: "User already exists with this email",
+                status: "failed"
+            })
+        }
+
+        const user = await userModel.create({ email, password, name })
+
+        const token = jwt.sign(
+            { userId: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" }
+        )
+
+        res.cookie("token", token)
+        res.status(201).json({
+            user: {
+                _id: user._id,
+                email: user.email,
+                name: user.name
+            },
+            token
         })
-     }
-     const user=await userModel.create({
-        email,password,name
-     })
-     //jwt.sifn ask = payload ad private key(private key=search on google jwt secret key generator)
-const token = jwt.sign(
-  { userId: user._id },
-  process.env.JWT_SECRET,
-  { expiresIn: "7d" }
-);//next step set token in cookies npm i cookie-parser
-res.cookie("token",token)
-res.status(201).json({
-    user:{
-        _id:user._id,
-        email:user.email,
-        name:user.name
-    },
-    token
-})
+    } catch (err) {
+        console.error("Register error:", err.message)
+        res.status(500).json({
+            message: err.message || "Internal server error",
+            status: "failed"
+        })
+    }
 }
-module.exports={
-    userRegisterController
-}
+
+module.exports = { userRegisterController }
